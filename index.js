@@ -13,40 +13,41 @@ var Slider = {
     Event.on(document, "click change input", "[type=range]", self.focus)
   },
 
+  // When a slider is changed, update the associated label and input.
   change: function(event) {
     self.refresh(event.currentTarget)
   },
 
+  // Update labels and inputs
   refresh: function (slider) {
     self.setLabels(slider)
     self.setInput(slider)
   },
   
+  // Some browsers don't focus when a slider input is changed, this lets us force focus.
   focus: function(event){
     event.currentTarget.focus()
   },
                               
+  // Inject slider templates into the DOM
   setup: function(){
-    var ranges = document.querySelectorAll('[type=range]:not(.range-input)')
-    Array.prototype.forEach.call(ranges, self.initSlider)
-  },
-  
-  initSlider: function(slider){
+    var ranges = document.querySelectorAll('[type=range]:not(.slider-input)')
 
-    var data = self.data(slider)
+    Array.prototype.forEach.call(ranges, function(slider){
 
-    slider.setAttribute('min', data.min)
-    slider.setAttribute('max', data.max)
-    slider.dataset.id = data.id
+      var data = self.data(slider)
+      sliders.push(data)
 
-    sliders.push(data)
+      slider.dataset.id = data.id
 
-    self.template(slider)
-    self.refresh(slider)
+      // Inject template and set inputs
+      self.template(slider)
+      self.refresh(slider)
+
+    })
   },
 
   data: function(el) {
-
     var data = {
       // Assign an incremental ID to track this slider with its data
       id: sliders.length,
@@ -73,13 +74,12 @@ var Slider = {
     }
 
     if (data.input) {
-      // Generate a class name for querying later (because some name attributes 
-      // contain illegal characters for queries)
+      // Generate a class name for querying later (because some name attributes contain illegal characters for queries)
       data.inputClass = data.input.replace(/\W/g,'-')
       data.inputExists = self.inputExists(el, data)
     }
 
-    data.lineLabels = self.getLineLabels(data)
+    data = self.getLineLabels(data)
 
     if (data.mark) { 
       data.mark = data.mark.split(',').map(Number) 
@@ -108,13 +108,26 @@ var Slider = {
     return data
   },
 
+  // Convert dataset strings into hashes of arrays
+  // examples:
+  //  - data-label='one,two,three' => data.labels.default = ['one','two','three']
+  //  - data.external-label-awesome='one;two;three' => data.externalLabels.awesome = ['one','two','three']
+  //
+  //  If labels have not been disabled (data-label='false') and there are no data labels,
+  //  an array of values is set to data.labels.default
+  //
   getLabels: function(data) {
-    var noLabel = (data.label && data.label.match(/false|none/))
+    if (data.label && data.label.match(/false|none/))
+      data.label = false
 
     // Unless labels have been disabed with data-label='false'
     for (var val in data) {
       // Ignore non-native methods injected by some wayward lib
       if (!data.hasOwnProperty(val)) { continue }
+      if (data[val] === false) { 
+        delete data[val]
+        continue 
+      }
 
       // Match properties: label, label-id, external-label-id
       var match = val.match(/label-(.+)|^label$/)
@@ -128,22 +141,23 @@ var Slider = {
 
         if(val.match(/^external/)){
           data.externalLabels[name] = labels
-        } else if (!noLabel) {
-          if (val == 'label')
-            data.labels.default = labels
-          else
-            data.labels[name] = labels
+        } else if (val == 'label') {
+          data.labels.default = labels
+          delete data.label
+        } else {
+          data.labels[name] = labels
         }
 
         delete data[val]
       }
 
-      var labelSize = self.objectSize(data.labels)
+      var labelCount = self.objectSize(data.labels)
 
-      if (labelSize == 0) 
+      // If there are no labels, use values for a label
+      if (labelCount == 0)
         data.labels.default = data.values
 
-      else if (labelSize > 1)
+      if (labelCount > 1)
         delete data.labels.default
     }
 
@@ -153,43 +167,53 @@ var Slider = {
   getLineLabels: function(data){
     var lineLabels = {}
 
+    // Line labels may be in the following formats:
+    // - 1:start,11:end              - index specified, comma separated
+    // - first,second,third,11:last  - default to index for some labels
+    // - 10,000;20,000;30,000        - semicolon separated
+    //
     if(data.lineLabels) {
       var delimiter = data.lineLabels.match(/;/) ? ';' : ','
       data.lineLabels.split(delimiter).map(function(labels, index){
         var l = labels.split(':')
-        lineLabels[Number(l[0] || index)] = l[1]
+        lineLabels[Number(l[0] || (index + 1))] = l[1]
       })
-      return lineLabels
+      data.lineLabels = lineLabels
     }
-  },
-  
 
-  trim: function(name){ 
-    return name.trim()
+    return data
   },
 
+  // 
   template: function(slider){
     var data = self.getData(slider)
+    //
+    // Update attributes from processed data
+    if(!slider.getAttribute('value'))
+      slider.value = data.min
 
-    slider.classList.add('range-input-slider', 'range-slider')
+    slider.setAttribute('min', data.min)
+    slider.setAttribute('max', data.max)
+
+    slider.classList.add('slider-input')
 
     var container = domify(
       '<div class="slider-container" id="slider'+data.id+'">'
       + self.templateHTML(data)
       +'</div>')
 
-    if (container.querySelector('.range-line-label')) {
+    if (container.querySelector('.slider-line-label')) {
       container.classList.add('line-labels')
     }
 
-    if (container.querySelector('.range-label')) {
+    if (container.querySelector('.slider-label')) {
       container.classList.add("with-label")
     } else {
       container.classList.add("without-label")
     }
 
     slider.insertAdjacentElement('beforebegin', container)
-    container.querySelector('.range-input-container').insertAdjacentElement('afterbegin', slider)
+    container.querySelector('.slider-input-container').insertAdjacentElement('afterbegin', slider)
 
     return container
   },
@@ -200,21 +224,21 @@ var Slider = {
     if (data.mark || data.lineLabels) {
       for(var i = 1; i <= data.segments; i++) {
         
-        html += "<div class='range-segment'><span class='range-segment-content'>"
+        html += "<div class='slider-segment'><span class='slider-segment-content'>"
 
         if (data.mark.indexOf(i) != -1)
-          html += "<span class='range-segment-mark'></span>"
+          html += "<span class='slider-segment-mark'></span>"
 
         if (data.lineLabels && data.lineLabels[i]) 
-          html += "<span class='range-line-label'>"+data.lineLabels[i]+"</span>"
+          html += "<span class='slider-line-label'>"+data.lineLabels[i]+"</span>"
 
         html += "</span></div>"
       }
     }
 
-    html = "<div class='range-input-container'>"
-      + "<div class='range-track'>" + html + "</div>"
-      + "<div class='range-track-bg'></div>"
+    html = "<div class='slider-input-container'>"
+      + "<div class='slider-track'>" + html + "</div>"
+      + "<div class='slider-track-bg'></div>"
       + "</div>"
       + self.labelTemplate(data)
 
@@ -234,20 +258,21 @@ var Slider = {
       var before = data.beforeLabel || data[altKey+'BeforeLabel']
       var after  = data.afterLabel || data[altKey+'AfterLabel']
 
-      html += "<span class='range-label-"+key+"'>"
+      html += "<span class='slider-label-"+key+"'>"
       if (before) { html += "<span class='before-label'>"+before+"</span>" }
-      html += "<span data-range-label='"+key+"'></span>"
+      html += "<span data-slider-label='"+key+"'></span>"
       if (after)  { html += "<span class='after-label'>"+after+"</span>" }
       html += "</span> "
     }
 
     if (html.length > 0) {
-      html = "<div class='range-label'>" + html + "</div>"
+      html = "<div class='slider-label'>" + html + "</div>"
     }
 
     return html
   },
 
+  // Is there already an input matching this name?
   inputExists: function(slider, data) {
     if (data.inputClass) {
       var input = self.scope(slider).querySelector('input[name="'+data.input+'"]')
@@ -257,16 +282,6 @@ var Slider = {
         return true
       }
     }
-  },
-
-  scope: function(slider) {
-    var el = slider
-
-    while (el && el.tagName != "FORM") {
-      el = el.parentNode
-    }
-
-    return el || document
   },
 
   extractData: function(el) {
@@ -284,36 +299,23 @@ var Slider = {
     return data
   },
 
-  setLabels: function(slider) {
-    var data = self.getData(slider)
-    var index = self.rangeValueIndex(slider)
+  labelElements: function(id, key, external) {
+    var selector = '[data-slider-label='+key+']'
+    var scopedSelector = '#slider'+id+' '+ selector
 
-    Array.prototype.forEach.call(['labels', 'externalLabels'], function(type) {
-      for (var key in data[type]) {
-        var labelEls = self.findLabels(data, type, key)
-        var labels = self.labelAtIndex(data[type], index)
-
-        Array.prototype.forEach.call(labelEls, function(el) {
-          el.innerHTML = labels[key]
-        })
-      }
-    })
-  },
-
-  findLabels: function(data, type, key) {
-    var selector = '[data-range-label='+key+']'
-    var scopedSelector = '#slider'+data.id+' '+ selector
-
-    selector = (type == 'external' ? selector : scopedSelector)
+    selector = (external ? selector : scopedSelector)
 
     return document.querySelectorAll(selector)
   },
 
   setInput: function(slider) {
-    var data = sliders[slider.dataset.id]
+    var data = self.getData(slider)
+
+    // Don't update hidden sliders
     if (slider.offsetParent === null) { return }
+
     if (data.input && data.values) {
-      var value = data.values[self.rangeValueIndex(slider)]
+      var value = data.values[self.sliderIndex(slider)]
       var selector = "."+data.input.replace(/\W/g,'-')
       var inputs = self.scope(slider).querySelectorAll(selector)
 
@@ -323,6 +325,23 @@ var Slider = {
     }
   },
 
+  setLabels: function(slider) {
+    var data = self.getData(slider)
+    var index = self.sliderIndex(slider)
+
+    Array.prototype.forEach.call(['labels', 'externalLabels'], function(type) {
+      for (var key in data[type]) {
+        var labelEls = self.labelElements(data.id, key, type == 'externalLabels')
+        var labels = self.labelAtIndex(data[type], index)
+
+        Array.prototype.forEach.call(labelEls, function(el) {
+          el.innerHTML = labels[key]
+        })
+      }
+    })
+  },
+
+  // Get all labels for the current slider position
   labelAtIndex: function(labels, index){
     var set = {}
     for (var key in labels) {
@@ -331,20 +350,29 @@ var Slider = {
     return set
   }, 
 
-  valueLabels: function(slider) {
-    var values = []
-    var start = Number(slider.getAttribute('min')) || 0
-    var end = Number(slider.getAttribute('max')) || 100
+  // Normalize the slider value by the minimum value
+  sliderIndex: function(slider){
+    return Number(slider.value) - Number(slider.getAttribute('min'))
+  },
 
-    for (var i = start; i <= end; i++ ) {
-      values[i] = i
+  // If slider is in a form, return that form.
+  // This alows us to be sure that sliders in one
+  // form do not update labels with the same name
+  // in another form.
+  //
+  scope: function(slider) {
+    var el = slider
+
+    while (el && el.tagName != "FORM") {
+      el = el.parentNode
     }
 
-    return values
+    return el || document
   },
-  
-  rangeValueIndex: function(slider){
-    return Number(slider.value) - Number(slider.getAttribute('min'))
+
+  // Function for easy maping, as in: someArray.map(self.trim)
+  trim: function(name){ 
+    return name.trim()
   },
 
   objectSize: function(object) {

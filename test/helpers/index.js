@@ -1,13 +1,16 @@
 var domify = require('domify')
 var Event = require('compose-event')
+var Slider = require('../../')
+
+var $ = function(selector) { return document.querySelector(selector) }
 
 var helpers = {
   el: function() {
-    return document.querySelector('input[type="range"]')
+    return $('input[type="range"]')
   },
 
   container: function() {
-    return document.querySelector('#container')
+    return $('#container')
   },
 
   new: function (options) {
@@ -30,7 +33,7 @@ var helpers = {
   },
 
   remove: function(selector) {
-    var element = document.querySelector(selector)
+    var element = $(selector)
     if (element) {
       Array.prototype.forEach.call(element.children, function(child) {
         element.removeChild(child)
@@ -49,21 +52,33 @@ var helpers = {
     return slider
   },
 
+  data: function() {
+    return Slider.getData(this.el())
+  },
+
   setValue: function(val) {
     var slider = this.el()
     slider.value = val
     Event.fire(slider, 'input')
   },
 
-  getValue: function(){
-    var hidden = document.querySelector('input[type="hidden"]')
+  value: function(){
+    var hidden = $('input[type="hidden"]')
     if(hidden) {
-      return hidden.value
+      return this.parseVal(hidden.value)
     } else {
-      return this.el().value
+      return this.parseVal(this.el().value)
     }
-  }
+  },
 
+  label: function(type) {
+    type = type || 'default'
+    return this.parseVal($('.slider-label-'+type).textContent)
+  },
+
+  parseVal: function(val) {
+    return (val).match(/^d+$/) ? Number(val) : val
+  }
 }
 
 module.exports = helpers
