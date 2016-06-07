@@ -8,6 +8,7 @@ var container = function() {
   return document.querySelector('.range-input-container')
 }
 var $ = function(selector) { return document.querySelector(selector) }
+var $$ = function(selector) { return document.querySelectorAll(selector) }
 
 describe('Slider', function(){
   before(function(){
@@ -30,19 +31,8 @@ describe('Slider', function(){
     assert.equal(input.data().segments, 101)
   })
 
+  // Complex labels and prefixes and suffixes
   it('adds a multiple labels with a prefixes and suffixes', function(){
-    input.add({
-      data: { 
-        aBeforeLabel: 'a', aAfterLabel: 'a', bBeforeLabel: 'b', bAfterLabel: 'b',
-        labelA: [1,2,3,4,5],
-        labelB: [6,7,8,9,10]
-      }
-    })
-    assert.equal(input.label('a'), 'a1a')
-    assert.equal(input.label('b'), 'b6b')
-  })
-
-  it('Default labels are not added when custom labels are present', function(){
     input.add({
       data: { 
         aBeforeLabel: 'a', aAfterLabel: 'a', bBeforeLabel: 'b', bAfterLabel: 'b',
@@ -51,10 +41,18 @@ describe('Slider', function(){
         labelB: [6,7,8,9,10]
       }
     })
+    // Ensure that a default label is never displayed when
+    // multiple lables are set
     assert.isNull($('.slider-label-default'))
+
+    assert.equal(input.label('a'), 'a1a')
+    assert.equal(input.label('b'), 'b6b')
+    input.setValue(4)
+    assert.equal(input.label('a'), 'a5a')
+    assert.equal(input.label('b'), 'b10b')
   })
 
-  it('sets labels based on values', function(){
+  it('sets labels from values when labels are not present', function(){
     var slider = input.add({
       data: {
         values: ['poor', 'fair', 'good', 'great', 'awesome'],
@@ -62,30 +60,78 @@ describe('Slider', function(){
       }
     })
     assert.equal(input.data().segments, 5)
-    assert.equal(input.el().value, 0)
     assert.equal(input.label(), 'poor')
+    input.setValue(4)
+    assert.equal(input.label(), 'awesome')
   })
 
-  it('updates input with values setting', function(){
+  it('adds marks', function(){
     var slider = input.add({
       data: {
-        values: ['poor', 'fair', 'good', 'great', 'awesome'],
-        input: 'test'
+        mark: [1, 10, 100]
       }
     })
-    input.setValue(5)
-    assert.equal(input.value(), 'awesome')
-  })
-})
 
-// Test labels
-//
-// Test extractLabels
-//
-// Test inputTemplate
-// 
-// Test rangeTemplate
-//
-// Test lineLabels
-//
-// test labelTemplate
+    assert.equal($$('.slider-segment-mark').length, 3)
+
+    var segments = $$('.slider-segment-content')
+
+    // Ensure that the indexes where the marks are set are correct
+    assert.isNotNull(segments[0].querySelector('.slider-segment-mark'))
+    assert.isNotNull(segments[9].querySelector('.slider-segment-mark'))
+    assert.isNotNull(segments[99].querySelector('.slider-segment-mark'))
+  })
+
+  it('adds line labels', function(){
+    var slider = input.add({
+      max: 10,
+      data: {
+        lineLabels: ['1:a', '6:b', '11:c']
+      }
+    })
+
+    var lineLabels = $$('.slider-line-label')
+    assert.equal(lineLabels.length, 3)
+    
+    assert.equal(lineLabels[0].innerHTML, 'a')
+    assert.equal(lineLabels[1].innerHTML, 'b')
+    assert.equal(lineLabels[2].innerHTML, 'c')
+
+    var segments = $$('.slider-segment-content')
+    // Ensure that the indexes where the labels are set are correct
+    assert.equal(segments[0].textContent, 'a')
+    assert.equal(segments[5].textContent, 'b')
+    assert.equal(segments[10].textContent, 'c')
+  })
+
+  it('adds line labels with defaulted indexes', function(){
+    var slider = input.add({
+      max: 10,
+      data: {
+        lineLabels: ['a', 'b', 'c']
+      }
+    })
+
+    var segments = $$('.slider-segment-content')
+    // Ensure that the indexes where the labels are set are correct
+    assert.equal(segments[0].textContent, 'a')
+    assert.equal(segments[1].textContent, 'b')
+    assert.equal(segments[2].textContent, 'c')
+  })
+
+  it('adds complex line labels', function(){
+    var slider = input.add({
+      max: 10,
+      data: {
+        lineLabels: '10,000;20,000;30,000'
+      }
+    })
+
+    var segments = $$('.slider-segment-content')
+    // Ensure that the indexes where the labels are set are correct
+    assert.equal(segments[0].textContent, '10,000')
+    assert.equal(segments[1].textContent, '20,000')
+    assert.equal(segments[2].textContent, '30,000')
+  })
+
+})

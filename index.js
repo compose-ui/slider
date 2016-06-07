@@ -130,16 +130,17 @@ var Slider = {
       }
 
       // Match properties: label, label-id, external-label-id
-      var match = val.match(/label-(.+)|^label$/)
+      var match = val.match(/^(external-)?label-(.+)|^label$/)
 
       if(match) {
         // Some labels may include commas, allow semicolons as an alternate separator
         //
         var delimiter = data[val].match(/;/) ? ';' : ','
         var labels    = data[val].split(delimiter).map(self.trim)
-        var name      = match[1]
+        var external  = match[1]
+        var name      = match[2]
 
-        if(val.match(/^external/)){
+        if(external){
           data.externalLabels[name] = labels
         } else if (val == 'label') {
           data.labels.default = labels
@@ -176,7 +177,9 @@ var Slider = {
       var delimiter = data.lineLabels.match(/;/) ? ';' : ','
       data.lineLabels.split(delimiter).map(function(labels, index){
         var l = labels.split(':')
-        lineLabels[Number(l[0] || (index + 1))] = l[1]
+        label = (!l[1] ? l[0] : l[1])
+        index = (!l[1] ? index + 1 : l[0])
+        lineLabels[index] = label
       })
       data.lineLabels = lineLabels
     }
@@ -226,7 +229,7 @@ var Slider = {
         
         html += "<div class='slider-segment'><span class='slider-segment-content'>"
 
-        if (data.mark.indexOf(i) != -1)
+        if (data.mark && data.mark.indexOf(i) != -1)
           html += "<span class='slider-segment-mark'></span>"
 
         if (data.lineLabels && data.lineLabels[i]) 
