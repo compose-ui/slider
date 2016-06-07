@@ -134,4 +134,23 @@ describe('Slider', function(){
     assert.equal(segments[2].textContent, '30,000')
   })
 
+
+  it('updates external labels', function(){
+    var slider = input.add({
+      max: 4,
+      data: {
+        externalLabelA: '1,2,3,4,5',
+        externalLabelB: '6,7,8,9,10'
+      }
+    })
+
+    var labelA = input.inject('<span data-slider-label="a">')
+    var labelB = input.inject('<span data-slider-label="b">')
+
+    input.setValue(1)
+
+    assert.equal(labelA.textContent, 2)
+    assert.equal(labelB.textContent, 7)
+  })
+
 })

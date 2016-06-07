@@ -13,6 +13,12 @@ var helpers = {
     return $('#container')
   },
 
+  inject: function(el){
+    el = domify(el)
+    this.container().appendChild(el)
+    return el
+  },
+
   new: function (options) {
     options = options || {}
     range = domify('<input type="range">')
