@@ -34,8 +34,8 @@ describe('Slider', function(){
   // Complex labels and prefixes and suffixes
   it('adds a multiple labels with a prefixes and suffixes', function(){
     input.add({
-      data: { 
-        aBeforeLabel: 'a', aAfterLabel: 'a', bBeforeLabel: 'b', bAfterLabel: 'b',
+      data: {
+        beforeLabelA: 'a', afterLabelA: 'a', beforeLabelB: 'b', afterLabelB: 'b',
         label: ['a','b','c','d','e'],
         labelA: [1,2,3,4,5],
         labelB: [6,7,8,9,10]

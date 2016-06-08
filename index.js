@@ -257,9 +257,14 @@ var Slider = {
     var html = ""
 
     for(var key in data.labels){
-      var altKey = self.camelCase(key)
-      var before = data.beforeLabel || data[altKey+'BeforeLabel']
-      var after  = data.afterLabel || data[altKey+'AfterLabel']
+      // Grab all prefixes or suffixes, examples:
+      // - data-before-label='$'
+      // - data-after-label='/mo'
+      // - data-after-label-size='GB'
+      //
+      var altKey = self.camelCase('-label-'+key)
+      var before = data.beforeLabel || data['before'+altKey]
+      var after  = data.afterLabel || data['after'+altKey]
 
       html += "<span class='slider-label-"+key+"'>"
       if (before) { html += "<span class='before-label'>"+before+"</span>" }
