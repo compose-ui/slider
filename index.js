@@ -124,10 +124,8 @@ var Slider = {
     for (var val in data) {
       // Ignore non-native methods injected by some wayward lib
       if (!data.hasOwnProperty(val)) { continue }
-      if (data[val] === false) { 
-        delete data[val]
-        continue 
-      }
+      // Don't bother processing disabled labels
+      if (data[val] === false) { continue }
 
       // Match properties: label, label-id, external-label-id
       var match = val.match(/^(external-)?label-(.+)|^label$/)
@@ -256,21 +254,12 @@ var Slider = {
   labelTemplate: function(data){
     var html = ""
 
-    for(var key in data.labels){
-      // Grab all prefixes or suffixes, examples:
-      // - data-before-label='$'
-      // - data-after-label='/mo'
-      // - data-after-label-size='GB'
-      //
-      var altKey = self.camelCase('-label-'+key)
-      var before = data.beforeLabel || data['before'+altKey]
-      var after  = data.afterLabel || data['after'+altKey]
+    if (data.label == false) { return html }
 
-      html += "<span class='slider-label-"+key+"'>"
-      if (before) { html += "<span class='before-label'>"+before+"</span>" }
-      html += "<span data-slider-label='"+key+"'></span>"
-      if (after)  { html += "<span class='after-label'>"+after+"</span>" }
-      html += "</span> "
+    for(var key in data.labels){
+      html += '<span class="slider-label-'+key+' internal-label" data-slider-label="'+key+'">'
+      html += self.labelHTML(data, key, '')
+      html += '</span></span> '
     }
 
     if (html.length > 0) {
@@ -278,6 +267,26 @@ var Slider = {
     }
 
     return html
+  },
+
+  labelHTML: function(data, key, label) {
+    return self.labelMeta(data, key, 'before')
+    + "<span class='slider-label-content'>" + label + "</span>"
+    + self.labelMeta(data, key, 'after')
+  },
+
+  // Grab all prefixes or suffixes, for example:
+  // - data-before-label='$'
+  // - data-after-label='/mo'
+  // - data-after-label-size='GB'
+  //
+  labelMeta: function(data, key, position) {
+    var altKey = self.camelCase('-label-'+key)
+    var meta = data[position+altKey] || data[position+'Label']
+    if (meta)
+      return "<span class='"+position+"-label'>"+meta+"</span>"
+    else
+      return ''
   },
 
   // Is there already an input matching this name?
@@ -309,9 +318,13 @@ var Slider = {
 
   labelElements: function(id, key, external) {
     var selector = '[data-slider-label='+key+']'
-    var scopedSelector = '#slider'+id+' '+ selector
-
-    selector = (external ? selector : scopedSelector)
+    var internalSelector = "#slider"+id + ' ' + selector
+    var externalSelector = selector += ':not(.internal-label)' 
+    if (external) { 
+      selector = externalSelector
+    } else {
+      selector = internalSelector + ', ' + externalSelector
+    }
 
     return document.querySelectorAll(selector)
   },
@@ -338,12 +351,14 @@ var Slider = {
     var index = self.sliderIndex(slider)
 
     Array.prototype.forEach.call(['labels', 'externalLabels'], function(type) {
+      var external = (type == 'externalLabels')
+
       for (var key in data[type]) {
-        var labelEls = self.labelElements(data.id, key, type == 'externalLabels')
+        var labelEls = self.labelElements(data.id, key, external)
         var labels = self.labelAtIndex(data[type], index)
 
         Array.prototype.forEach.call(labelEls, function(el) {
-          el.innerHTML = labels[key]
+          el.innerHTML = self.labelHTML(data, key, labels[key])
         })
       }
     })

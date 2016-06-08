@@ -24,15 +24,23 @@ javascript.
 | `label`         | Custom label (if ommited, defaults to data-values) | `One, Four,Eight,…` |
 | `before-label`  | Set a label prefix                                 | `$` |
 | `after-label`   | Set a label suffix                                 | `.00` |
-| `label-price`, `label-plan` | Use `data-label-[whatever]` to set multiple labels at once | `data-label-price="10,20,…"`, `data-label-plan="Bronze,Silver,…"` |
-| `before-label-[custom]`   | Set a custom label prefix                | `data-before-label-price='$'` `data-before-label-plan='Plan: '` |
-| `after-label-[custom]`    | Set a custom label prefix                | `data-after-price-='.00 /month'` |
 | `mark`          | Add a marker to highlight a slider segment (1 based index) | `1,5,10` |
 | `line-labels`   | Add labels inline on slider (1 based index)        | options: `Bronze,Silver,Gold`, `1:Bronze,2:Silver,3:Gold` |
+| `label-[custom]`, `label-[custom]` | Use `data-label-whatever` to set multiple labels at once | `data-label-price="10,20,…"`, `data-label-plan="Bronze,Silver,…"` |
+| `before-label-[custom]`   | Use `data-before-label-whatever` to set custom prefixes for a specific label  | `data-before-label-price='$'` `data-before-label-plan='Plan: '` |
+| `after-label-[custom]`    | Use `data-after-label-whatever` to set custom suffixes for a specific label  | `data-after-price-='.00 /month'` |
+| `external-label-[custom]` | Update contents of any element on the page with `data-slider-label="custom"` | `data-external-label-price` updates `data-slider-label='price'` |
+
+
+Some things to note:
+
+- All `input type="range"` elements will be converted into sliders.
+- If no custom label is specified, the value will be displayed as the label.
+- 
 
 ### Examples:
 
-#### Add a label with a suffix
+#### Add a label and suffix to a standard range input
 
 Use `data-after-label='%'` to add a suffix to the slider label.
 
@@ -46,7 +54,6 @@ Use `data-input` and `data-values` to set custom values for an input.
 
 ```html
 <input type="range" data-input='rating' data-values="poor,fair,good,great">
-
 ```
 
 This will:

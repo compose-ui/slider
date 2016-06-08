@@ -3,18 +3,18 @@ var domify = require('domify')
 var Slider = require('../')
 var Event = require('compose-event')
 
-var input = require('./helpers/index')
-var container = function() {
-  return document.querySelector('.range-input-container')
-}
+var input = require('./helpers/input')
+var container = require('./helpers/container')
 var $ = function(selector) { return document.querySelector(selector) }
 var $$ = function(selector) { return document.querySelectorAll(selector) }
 
 describe('Slider', function(){
   before(function(){
-    document.body.appendChild(domify('<div id="container">'))
+    container.init()
     Event.fire(document, 'DOMContentLoaded')
   })
+
+  beforeEach(container.reset)
 
   it('sets label to value', function(){
     input.add({value: 20})
@@ -135,22 +135,25 @@ describe('Slider', function(){
   })
 
 
-  it('updates external labels', function(){
+  it('updates external labels only when label is disabled', function(){
     var slider = input.add({
       max: 4,
       data: {
-        externalLabelA: '1,2,3,4,5',
-        externalLabelB: '6,7,8,9,10'
+        label: false,
+        labelA: '1,2,3,4,5',
+        labelB: '6,7,8,9,10',
+        beforeLabelA: '$'
       }
     })
 
-    var labelA = input.inject('<span data-slider-label="a">')
-    var labelB = input.inject('<span data-slider-label="b">')
+    var labelA = container.inject('<span data-slider-label="a">')
+    var labelB = container.inject('<span data-slider-label="b">')
 
     input.setValue(1)
 
-    assert.equal(labelA.textContent, 2)
+    assert.equal(labelA.textContent, '$2')
     assert.equal(labelB.textContent, 7)
+    assert.isNull($('.internal-label'))
   })
 
 })

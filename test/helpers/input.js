@@ -1,22 +1,13 @@
 var domify = require('domify')
 var Event = require('compose-event')
 var Slider = require('../../')
+var container = require('./container')
 
 var $ = function(selector) { return document.querySelector(selector) }
 
-var helpers = {
+var input = {
   el: function() {
     return $('input[type="range"]')
-  },
-
-  container: function() {
-    return $('#container')
-  },
-
-  inject: function(el){
-    el = domify(el)
-    this.container().appendChild(el)
-    return el
   },
 
   new: function (options) {
@@ -38,21 +29,9 @@ var helpers = {
     return range
   },
 
-  remove: function(selector) {
-    var element = $(selector)
-    if (element) {
-      Array.prototype.forEach.call(element.children, function(child) {
-        element.removeChild(child)
-      })
-    }
-
-    return element
-  },
-
   add: function(options) {
-    var el = this.remove('#container')
     var slider = this.new(options)
-    el.appendChild(slider)
+    container.inject(slider)
     Event.fire(document, 'page:change')
 
     return slider
@@ -87,4 +66,4 @@ var helpers = {
   }
 }
 
-module.exports = helpers
+module.exports = input
