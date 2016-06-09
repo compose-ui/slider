@@ -156,4 +156,22 @@ describe('Slider', function(){
     assert.isNull($('.internal-label'))
   })
 
+  it('updates external labels only when label is disabled', function(){
+    var slider = input.add({
+      max: 4,
+      data: {
+        labelA: '1,2,3,4,5',
+        externalLabelA: '6,7,8,9,10',
+        beforeLabelA: '$'
+      }
+    })
+
+    var labelA = container.inject('<span data-slider-label="a">')
+
+    input.setValue(1)
+
+    assert.equal(labelA.textContent, '$7')
+    assert.equal(input.label('a'), '$2')
+  })
+
 })

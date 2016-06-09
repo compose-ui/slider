@@ -58,7 +58,12 @@ var input = {
 
   label: function(type) {
     type = type || 'default'
-    return this.parseVal($('.slider-label-'+type).textContent)
+    var el = $('.slider-label-'+type)
+    if (el) {
+      return this.parseVal(.textContent)
+    } else {
+      console.error('Value not found for '+type+' label.')
+    }
   },
 
   parseVal: function(val) {
