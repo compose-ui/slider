@@ -78,7 +78,7 @@ This will:
 - Update an input with `name='rating'` with values from `0-3`.
 - Update elements matching `data-slider-label='rating'` with `poor,fair,good, or great`
 
-## Use slider labels and external labels
+#### Use slider labels and external labels
 
 Here's an example of a slider which ties units to price, displaying units on the slider and price elsewhere on the page.
 
