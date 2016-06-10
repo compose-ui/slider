@@ -20,7 +20,7 @@ describe('Slider', function(){
     input.add({value: 20})
     assert.equal(input.label(), 20)
     assert.equal(input.value(), 20)
-    input.setValue(5)
+    input.set(5)
     assert.equal(input.label(), 5)
     assert.equal(input.value(), 5)
   })
@@ -47,21 +47,22 @@ describe('Slider', function(){
 
     assert.equal(input.label('a'), 'a1a')
     assert.equal(input.label('b'), 'b6b')
-    input.setValue(4)
+    input.set(4)
     assert.equal(input.label('a'), 'a5a')
     assert.equal(input.label('b'), 'b10b')
   })
 
   it('sets labels from values when labels are not present', function(){
     var slider = input.add({
+      name: 'test',
       data: {
-        values: ['poor', 'fair', 'good', 'great', 'awesome'],
-        input: 'test'
+        values: ['poor', 'fair', 'good', 'great', 'awesome']
       }
     })
     assert.equal(input.data().segments, 5)
     assert.equal(input.label(), 'poor')
-    input.setValue(4)
+    input.set(4)
+    assert.equal(input.value(), 'awesome')
     assert.equal(input.label(), 'awesome')
   })
 
@@ -149,14 +150,14 @@ describe('Slider', function(){
     var labelA = container.inject('<span data-slider-label="a">')
     var labelB = container.inject('<span data-slider-label="b">')
 
-    input.setValue(1)
+    input.set(1)
 
     assert.equal(labelA.textContent, '$2')
     assert.equal(labelB.textContent, 7)
     assert.isNull($('.internal-label'))
   })
 
-  it('updates external labels only when label is disabled', function(){
+  it('Test for external label vs internal label with the same name', function(){
     var slider = input.add({
       max: 4,
       data: {
@@ -168,7 +169,7 @@ describe('Slider', function(){
 
     var labelA = container.inject('<span data-slider-label="a">')
 
-    input.setValue(1)
+    input.set(1)
 
     assert.equal(labelA.textContent, '$7')
     assert.equal(input.label('a'), '$2')

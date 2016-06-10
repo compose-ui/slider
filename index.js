@@ -73,6 +73,13 @@ var Slider = {
       }
     }
 
+    // Allow data-input or name attribute to set value for hidden input.
+    //
+    if (!data.input && el.getAttribute('name')) {
+      data.input = el.getAttribute('name')
+      el.removeAttribute('name')
+    }
+
     if (data.input) {
       // Generate a class name for querying later (because some name attributes contain illegal characters for queries)
       data.inputClass = data.input.replace(/\W/g,'-')

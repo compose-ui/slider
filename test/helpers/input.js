@@ -41,7 +41,7 @@ var input = {
     return Slider.getData(this.el())
   },
 
-  setValue: function(val) {
+  set: function(val) {
     var slider = this.el()
     slider.value = val
     Event.fire(slider, 'input')
@@ -60,7 +60,7 @@ var input = {
     type = type || 'default'
     var el = $('.slider-label-'+type)
     if (el) {
-      return this.parseVal(.textContent)
+      return this.parseVal(el.textContent)
     } else {
       console.error('Value not found for '+type+' label.')
     }
