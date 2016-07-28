@@ -1,6 +1,6 @@
 {
   "name": "compose-slider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Give range inputs the flexibility and features you'd expect.",
   "main": "index.js",
   "scripts": {

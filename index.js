@@ -9,6 +9,7 @@ var sliders = []
 
 var Slider = {
   listen: function(){
+    self.setup()
     Event.on(document, "input toggler:show", "[type=range]", self.change)
     Event.on(document, "click change input", "[type=range]", self.focus)
   },
