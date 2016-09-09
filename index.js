@@ -242,7 +242,7 @@ var Slider = {
         html += "<div class='slider-segment'><span class='slider-segment-content'>"
 
         if (data.mark && data.mark.indexOf(i) != -1)
-          html += "<span class='slider-segment-mark data-index='"+i+"'></span>"
+          html += "<span class='slider-segment-mark' data-index='"+i+"'></span>"
 
         if (data.lineLabels && data.lineLabels[i]) 
           html += "<span class='slider-line-label'>"+data.lineLabels[i]+"</span>"
