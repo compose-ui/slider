@@ -203,6 +203,9 @@ var Slider = {
 
     slider.classList.add('slider-input')
 
+    if(slider.classList.contains('left-label'))
+      slider.classList.remove('left-label')
+
     var containerHTML = self.templateHTML(data)
 
     var classes = ['slider-container']
@@ -225,8 +228,9 @@ var Slider = {
     slider.parentNode.removeChild(slider)
 
     slider = container.querySelector('.slider-input')
-    //
+    
     // Update attributes from processed data
+    //
     if(!slider.getAttribute('value'))
       slider.value = data.value || data.min
     return slider
@@ -282,7 +286,7 @@ var Slider = {
     }
 
     if (html.length > 0) {
-      html = "<div class='slider-label'>" + html + "</div>"
+      html = "<div class='slider-label align-"+(data.positionLabel || 'right')+"'>" + html + "</div>"
     }
 
     return html

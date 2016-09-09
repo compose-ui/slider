@@ -34,6 +34,7 @@ javascript.
 | `data-after-label-[custom]`    | Set a label suffix for a custom label              | `data-after-price-='.00 /month'` |
 | `data-mark`           | Add a marker to highlight a slider segment (1 based index)  | `1,5,10` |
 | `data-line-labels`    | Add labels inline on slider (1 based index)                 | `data-line-labels="Bronze,Silver,Gold"`, `data-line-labels="1:Bronze,2:Silver,3:Gold"` |
+| `data-position-label` | Add a classname to control position ('left' => '.align-left'), default: 'right'  | `left` or `right` |
 
 
 ### Examples:
