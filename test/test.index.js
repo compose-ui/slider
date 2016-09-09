@@ -1,5 +1,4 @@
 var assert = require('chai').assert
-var domify = require('domify')
 var Slider = require('../')
 var Event = require('compose-event')
 
@@ -38,12 +37,14 @@ describe('Slider', function(){
         beforeLabelA: 'a', afterLabelA: 'a', beforeLabelB: 'b', afterLabelB: 'b',
         label: ['a','b','c','d','e'],
         labelA: [1,2,3,4,5],
-        labelB: [6,7,8,9,10]
+        labelB: [6,7,8,9,10],
+        max: 4
       }
     })
     // Ensure that a default label is never displayed when
     // multiple lables are set
     assert.isNull($('.slider-label-default'))
+    assert.equal(input.data().segments, 5)
 
     assert.equal(input.label('a'), 'a1a')
     assert.equal(input.label('b'), 'b6b')

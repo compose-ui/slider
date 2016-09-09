@@ -1,8 +1,6 @@
 require ('./lib/object.assign')
 
 var Event = require('compose-event')
-var domify = require('domify')
-
 // Improves the utility and user interface for range inputs
 
 var sliders = []
@@ -23,6 +21,7 @@ var Slider = {
   refresh: function (slider) {
     self.setLabels(slider)
     self.setInput(slider)
+    self.setFill(slider)
   },
   
   // Some browsers don't focus when a slider input is changed, this lets us force focus.
@@ -42,7 +41,7 @@ var Slider = {
       slider.dataset.id = data.id
 
       // Inject template and set inputs
-      self.template(slider)
+      slider = self.template(slider)
       self.refresh(slider)
 
     })
@@ -64,7 +63,9 @@ var Slider = {
     data = self.extractValues(data)
     data = self.getLabels(data)
 
-    data.max = (data.min + data.values.length - 1)
+    if (data.values)
+      data.max = (data.min + data.values.length - 1)
+
     data.segments = Number(data.max) - Number(data.min) + 1
 
     for (var key in data) {
@@ -196,39 +197,44 @@ var Slider = {
   // 
   template: function(slider){
     var data = self.getData(slider)
-    //
-    // Update attributes from processed data
-    if(!slider.getAttribute('value'))
-      slider.value = data.min
 
     slider.setAttribute('min', data.min)
     slider.setAttribute('max', data.max)
 
     slider.classList.add('slider-input')
 
-    var container = domify(
-      '<div class="slider-container" id="slider'+data.id+'">'
-      + self.templateHTML(data)
-      +'</div>')
+    var containerHTML = self.templateHTML(data)
 
-    if (container.querySelector('.slider-line-label')) {
-      container.classList.add('line-labels')
-    }
+    var classes = ['slider-container']
 
-    if (container.querySelector('.slider-label')) {
-      container.classList.add("with-label")
-    } else {
-      container.classList.add("without-label")
-    }
+    if (containerHTML.match('slider-line-label'))
+      classes.push('line-labels')
 
-    slider.insertAdjacentElement('beforebegin', container)
-    container.querySelector('.slider-input-container').insertAdjacentElement('afterbegin', slider)
+    if (containerHTML.match('slider-label'))
+      classes.push("with-label")
+    else
+      classes.push("without-label")
 
-    return container
+    containerHTML = '<div class="'+classes.join(' ')+'" id="slider'+data.id+'">'
+      + containerHTML
+      +'</div>'
+
+    slider.insertAdjacentHTML('beforebegin', containerHTML)
+    var container = slider.previousSibling
+    container.querySelector('.slider-input-container').insertAdjacentHTML('afterbegin', slider.outerHTML)
+    slider.parentNode.removeChild(slider)
+
+    slider = container.querySelector('.slider-input')
+    //
+    // Update attributes from processed data
+    if(!slider.getAttribute('value'))
+      slider.value = data.value || data.min
+    return slider
   },
   
   templateHTML: function(data){
     var html = ""
+    var fills = ""
     
     if (data.mark || data.lineLabels) {
       for(var i = 1; i <= data.segments; i++) {
@@ -245,9 +251,14 @@ var Slider = {
       }
     }
 
+    // one less
+    for(var i = 1; i < data.segments; i++) {
+      fills += "<span class='slider-fill' data-index='"+i+"'></span>"
+    }
+
     html = "<div class='slider-input-container'>"
       + "<div class='slider-track'>" + html + "</div>"
-      + "<div class='slider-track-bg'></div>"
+      + "<div class='slider-fills'>" + fills + "</div>"
       + "</div>"
       + self.labelTemplate(data)
 
@@ -335,6 +346,28 @@ var Slider = {
     }
 
     return document.querySelectorAll(selector)
+  },
+
+  setFill: function(slider) {
+    var data = self.getData(slider)
+    var segments = document.querySelectorAll('#slider'+data.id+' .slider-segment')
+    var fills = document.querySelectorAll('#slider'+data.id+' .slider-fill')
+    var sliderIndex = self.sliderIndex(slider)
+    
+    Array.prototype.forEach.call(fills, function(fill, index){
+      if (fill.dataset.index <= sliderIndex) {
+        fill.classList.add('filled')
+        if(segments[index]) {
+          segments[index].classList.add('filled')
+        }
+      } else {
+        fill.classList.remove('filled')
+        if(segments[index]) {
+          segments[index].classList.remove('filled')
+        }
+      }
+    })
+    
   },
 
   setInput: function(slider) {

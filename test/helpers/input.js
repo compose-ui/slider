@@ -1,4 +1,3 @@
-var domify = require('domify')
 var Event = require('compose-event')
 var Slider = require('../../')
 var container = require('./container')
@@ -12,7 +11,9 @@ var input = {
 
   new: function (options) {
     options = options || {}
-    range = domify('<input type="range">')
+    document.body.insertAdjacentHTML('beforeend', '<input type="range">')
+    var range = document.body.lastChild
+    document.body.removeChild(range)
 
     Array.prototype.forEach.call(['name', 'min', 'max', 'value'], function(att) {
       if(options[att]) {

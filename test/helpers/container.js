@@ -1,10 +1,8 @@
-var domify = require('domify')
-
 var $ = function(selector) { return document.querySelector(selector) }
 
 var container = {
   init: function() {
-    document.body.appendChild(domify('<div id="container">'))
+    document.body.insertAdjacentHTML('beforeend', '<div id="container">')
   },
 
   el: function() {
@@ -12,10 +10,14 @@ var container = {
   },
 
   inject: function(el){
+
     if(typeof el == 'string') {
-      el = domify(el)
+      self.el().insertAdjacentHTML('beforeend', el)
+      el = self.el().lastElementChild
+    } else {
+      self.el().appendChild(el)
     }
-    self.el().appendChild(el)
+
     return el
   },
 
