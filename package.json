@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/compose-ui/slider#readme",
   "dependencies": {
-    "compose-event": "^1.0.0"
+    "compose-event": "^1.7.2"
   },
   "devDependencies": {
     "chai": "^3.5.0",
