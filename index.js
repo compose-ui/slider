@@ -4,14 +4,9 @@ var Event = require('compose-event')
 // Improves the utility and user interface for range inputs
 
 var sliders = []
+var listening
 
 var Slider = {
-  listen: function(){
-    self.setup()
-    Event.on(document, "input toggler:show", "[type=range]", self.change, { useCapture: true })
-    Event.on(document, "click change input", "[type=range]", self.focus, { useCapture: true })
-  },
-
   // When a slider is changed, update the associated label and input.
   change: function(event) {
     self.refresh(event.currentTarget)
@@ -31,6 +26,13 @@ var Slider = {
                               
   // Inject slider templates into the DOM
   setup: function(){
+
+    if (!listening) {
+      Event.on(document, "input toggler:show", "[type=range]", self.change, { useCapture: true })
+      Event.on(document, "click change input", "[type=range]", self.focus, { useCapture: true })
+      listening = true
+    }
+
     var ranges = document.querySelectorAll('[type=range]:not(.slider-input)')
 
     Array.prototype.forEach.call(ranges, function(slider){
@@ -294,7 +296,7 @@ var Slider = {
 
   labelHTML: function(data, key, label) {
     return self.labelMeta(data, key, 'before')
-    + "<span class='slider-label-content'>" + label + "</span>"
+    + "<span class='label-content'>" + label + "</span>"
     + self.labelMeta(data, key, 'after')
   },
 
@@ -395,6 +397,8 @@ var Slider = {
     var data = self.getData(slider)
     var index = self.sliderIndex(slider)
 
+    if (slider.offsetParent === null) { return }
+
     Array.prototype.forEach.call(['labels', 'externalLabels'], function(type) {
       var external = (type == 'externalLabels')
 
@@ -403,7 +407,12 @@ var Slider = {
         var labels = self.labelAtIndex(data[type], index)
 
         Array.prototype.forEach.call(labelEls, function(el) {
-          el.innerHTML = self.labelHTML(data, key, labels[key])
+          var container = el.querySelector('.label-content')
+
+          if ( container ) { container.innerHTML = labels[key] }
+          else { el.innerHTML = self.labelHTML(data, key, labels[key]) }
+
+          el.classList.toggle('empty-label', labels[key] == '')
         })
       }
     })
@@ -457,7 +466,6 @@ var Slider = {
 
 var self = Slider
 
-Event.ready(Slider.listen)
 Event.change(Slider.setup)
 
 module.exports = Slider
