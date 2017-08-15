@@ -412,7 +412,7 @@ var Slider = {
           if ( container ) { container.innerHTML = labels[key] }
           else { el.innerHTML = self.labelHTML(data, key, labels[key]) }
 
-          el.classList.toggle('empty-label', labels[key] == '')
+          el.classList.toggle('empty-label', labels[key] === '')
         })
       }
     })
