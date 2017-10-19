@@ -1,6 +1,6 @@
 {
   "name": "compose-slider",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Give range inputs the flexibility and features you'd expect.",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/compose-ui/slider#readme",
   "dependencies": {
-    "compose-event": "^1.7.2"
+    "compose-event": "^1.8"
   },
   "devDependencies": {
     "chai": "^3.5.0",
