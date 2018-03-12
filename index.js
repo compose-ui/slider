@@ -21,7 +21,9 @@ var Slider = {
   
   // Some browsers don't focus when a slider input is changed, this lets us force focus.
   focus: function(event){
-    event.currentTarget.focus()
+    if ( event.isTrusted ) { // Do not focus on "artificially triggered" events
+      event.currentTarget.focus()
+    }
   },
                               
   // Inject slider templates into the DOM
