@@ -15,11 +15,13 @@ var input = {
     var range = document.body.lastChild
     document.body.removeChild(range)
 
-    Array.prototype.forEach.call(['name', 'min', 'max', 'value'], function(att) {
+    Array.prototype.forEach.call(['id', 'name', 'min', 'max', 'value'], function(att) {
       if(options[att]) {
         range.setAttribute(att, options[att])
       }
     })
+
+    if ( options.value ) range.value = options.value
 
     for(var item in options.data) {
       if(!options.data.hasOwnProperty(item)){ continue }
@@ -69,6 +71,12 @@ var input = {
 
   parseVal: function(val) {
     return (val).match(/^d+$/) ? Number(val) : val
+  },
+
+  state: function() {
+    var id = this.el().dataset.id,
+        parent = document.querySelector('#slider'+id)
+    return parent.dataset.sliderState
   }
 }
 

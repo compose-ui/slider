@@ -17,6 +17,7 @@ var Slider = {
     self.setLabels(slider)
     self.setInput(slider)
     self.setFill(slider)
+    self.setState(slider)
   },
   
   // Some browsers don't focus when a slider input is changed, this lets us force focus.
@@ -43,6 +44,7 @@ var Slider = {
       sliders.push(data)
 
       slider.dataset.id = data.id
+      slider.dataset.initialValue = slider.value
 
       // Inject template and set inputs
       slider = self.template(slider)
@@ -343,6 +345,18 @@ var Slider = {
     return data
   },
 
+  getChange: function( slider ) {
+    var initial = Number(slider.dataset.initialValue)
+
+    if ( initial < slider.value ) {
+      return "increased"
+    } else if ( slider.value < initial ) {
+      return "decreased"
+    } else {
+      return "initial"
+    }
+  },
+
   labelElements: function(id, key, external) {
     var selector = '[data-slider-label='+key+']'
     var internalSelector = "#slider"+id + ' ' + selector
@@ -354,6 +368,18 @@ var Slider = {
     }
 
     return document.querySelectorAll(selector)
+  },
+
+  setState: function( slider ) {
+    var data = self.getData( slider ),
+        stateElements = document.querySelectorAll( '[data-track-slider-state="#'+slider.id+'"]' ),
+        change = self.getChange( slider )
+
+    document.querySelector('#slider'+data.id).dataset.sliderState = change
+
+    Array.prototype.forEach.call( stateElements, function(el) {
+      el.dataset.sliderState = change
+    })
   },
 
   setFill: function(slider) {

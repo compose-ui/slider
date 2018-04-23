@@ -9,17 +9,20 @@ var $$ = function(selector) { return document.querySelectorAll(selector) }
 
 describe('Slider', function(){
   before(function(){
+    container.reset()
     container.init()
     Event.fire(document, 'DOMContentLoaded')
   })
 
-  beforeEach(container.reset)
+  afterEach(container.reset)
 
   it('sets label to value', function(){
     input.add({value: 20})
     assert.equal(input.label(), 20)
     assert.equal(input.value(), 20)
+    //assert.equal(input.state(), 'initial')
     input.set(5)
+    //assert.equal(input.state(), 'decreased')
     assert.equal(input.label(), 5)
     assert.equal(input.value(), 5)
   })
