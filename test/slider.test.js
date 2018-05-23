@@ -1,9 +1,9 @@
 var u = require('./_utils.js')
 
+beforeAll(async () => {
+  await page.goto("http://localhost:8081/sliders.html")
+})
 describe('Browser slider testing', () => {
-  beforeAll(async () => {
-    await page.goto("http://localhost:8081/sliders.html")
-  })
 
   it('matches the initial state', async () => {
     await expect(page).toMatchElement('#slider-1 [data-slider-state="initial"]')
@@ -56,5 +56,9 @@ describe('Browser slider testing', () => {
     await u.findElement(`#slider-3 .slider-segment:first-child [data-index='1']`)
     await u.findElement(`#slider-3 .slider-segment:nth-child(6) [data-index='6']`)
     await u.findElement(`#slider-3 .slider-segment:last-child [data-index='11']`)
+  })
+
+  it('sets max and min from attributes', async () => {
+    await u.countIs('#slider-4 .slider-segment', 4)
   })
 })

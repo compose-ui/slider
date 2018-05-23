@@ -57,8 +57,8 @@ var Slider = {
     var data = {
       // Assign an incremental ID to track this slider with its data
       id: sliders.length,
-      min: el.getAttribute('min') || 0,
-      max: el.getAttribute('max') || 100,
+      min: Number(el.getAttribute('min')) || 0,
+      max: Number(el.getAttribute('max')) || 100,
       labels: {},
       externalLabels: {}
     }
@@ -72,7 +72,7 @@ var Slider = {
     if (data.values)
       data.max = (data.min + data.values.length - 1)
 
-    data.segments = Number(data.max) - Number(data.min) + 1
+    data.segments = data.max - data.min + 1
 
     for (var key in data) {
       if(key.match(/-/)){
@@ -97,7 +97,7 @@ var Slider = {
     data = self.getLineLabels(data)
 
     if (data.mark) { 
-      data.mark = data.mark.split(',').map(Number) 
+      data.mark = data.mark.split(',').map(Number)
     }
 
     return data
