@@ -2,6 +2,7 @@
 module.exports = u = {
   setValue: async (selector, value) => {
     await page.evaluate(`document.querySelector('${selector}').value = '${value}'`)
+    await page.evaluate(`var input = document.querySelector('${selector}'); Event.fire(input, 'input')`)
   },
 
   select: async (selector, option) => {
@@ -25,6 +26,10 @@ module.exports = u = {
     return await page.$eval(selector, e => e.outerHTML);
   },
 
+  data: async (selector, object) => {
+    return await page.$eval(selector, (e, object) => e.dataset[object], object);
+  },
+
   value: async (selector) => {
     return await page.$eval(selector, e => e.value);
   },
@@ -33,8 +38,12 @@ module.exports = u = {
     return expect( await u.value(selector)).toBe(expected)
   },
 
+  countIs: async (selector, expected) => {
+    return expect( await page.$$eval(selector, e => e.length)).toBe(expected)
+  },  
+
   matchText: async (selector, text) => {
-    return expect( await u.text(selector)).toBe(text)
+    return expect( (await u.text(selector)).trim() ).toBe(text)
   },
 
   text: async (selector) => {

@@ -1,1 +1,2 @@
-window.Slider = module.exports = require( '../index' )
+require( '../index' )
+window.Event = require('compose-event')
