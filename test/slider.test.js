@@ -4,13 +4,13 @@ beforeAll(async () => {
   await page.goto("http://localhost:8081/sliders.html")
 })
 
-describe('Browser slider testing', () => {
+describe('Slider', () => {
 
-  it('matches the initial state', async () => {
+  it('receives an initial state', async () => {
     await expect(page).toMatchElement('#slider-1 [data-slider-state="initial"]')
   })
 
-  it('can move a slider with the keyboard', async () => {
+  it('responds to keyboard arrows', async () => {
     await u.valueIs('#slider-1 input', '50')
     await page.focus('#slider-1 input')
 
@@ -21,12 +21,12 @@ describe('Browser slider testing', () => {
     await u.valueIs('#slider-1 input', '50')
   })
 
-  it('can set a value', async () => {
+  it('sets a value', async () => {
     await u.setValue('#slider-1 input', '10')
     await u.valueIs('#slider-1 input', '10')
   })
 
-  it('can track input changes with sliderState', async () => {
+  it('tracks input changes with sliderState', async () => {
     // Default is 50 so 49 should be a decreased state
     await u.setValue('#slider-1 input', '49')
     expect(await u.data('#slider-1 div', 'sliderState')).toBe('decreased')
@@ -40,7 +40,7 @@ describe('Browser slider testing', () => {
     expect(await u.data('#slider-1 div', 'sliderState')).toBe('initial')
   })
 
-  it('has a before and after label', async () => {
+  it('shows before and after labels', async () => {
     await u.matchText('#slider-1', 'Disk: 50MB')
   })
 
@@ -84,11 +84,11 @@ describe('Browser slider testing', () => {
     await u.findElement(`#slider-3 .slider-segment:last-child [data-index='11']`)
   })
 
-  it('sets max and min from attributes', async () => {
+  it('supports max and min attributes', async () => {
     await u.countIs('#slider-4 .slider-segment', 4)
   })
 
-  it('disables the label', async () => {
+  it('can disable the label', async () => {
     // data-label='false' should prevent the label from showing
     await u.matchText('#slider-5', '')
   })
@@ -105,7 +105,6 @@ describe('Browser slider testing', () => {
 
   it('only updates external labels when data-label="false"', async () => {
     // Make sure external label is in place
-    console.log(await u.html('#slider-7-container'))
     await u.setValue('#slider-7-container #slider-7 input', '1')
     await u.matchText(`#slider-7-container [data-slider-label="disk"]`, '2GB')
 
@@ -117,7 +116,7 @@ describe('Browser slider testing', () => {
     await u.isNull(`#slider-7-container .internal-label`)
   })
 
-  it('can update external labels with slider-state tracking', async () => {
+  it('updates external labels with slider-state tracking', async () => {
     // Make sure external label is in place
 
     await u.setValue('#slider-7 input', '4')
