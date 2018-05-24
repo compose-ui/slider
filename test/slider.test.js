@@ -93,7 +93,42 @@ describe('Browser slider testing', () => {
     await u.matchText('#slider-5', '')
   })
 
-  // TODO: Line lables
-  // TODO: External Labels
-  // TODO: External state tracking: data-track-slider-state="#sliderid"
+  it('adds line labels', async () => {
+    // There should only be three slider line labels
+    await u.countIs('#slider-6 .slider-line-label', 3)
+
+    // Line labels should occupy the right place in the DOM and have the right text
+    await u.matchText(`#slider-6 .slider-segment:first-child .slider-line-label`, '10,000')
+    await u.matchText(`#slider-6 .slider-segment:nth-child(6) .slider-line-label`, '20,000')
+    await u.matchText(`#slider-6 .slider-segment:last-child .slider-line-label`, '30,000')
+  })
+
+  it('only updates external labels when data-label="false"', async () => {
+    // Make sure external label is in place
+    console.log(await u.html('#slider-7-container'))
+    await u.setValue('#slider-7-container #slider-7 input', '1')
+    await u.matchText(`#slider-7-container [data-slider-label="disk"]`, '2GB')
+
+    // Make sure external label is updated when changing slider value
+    await u.setValue('#slider-7-container #slider-7 input', '2')
+    await u.matchText(`#slider-7-container [data-slider-label="disk"]`, '3GB')
+    
+    // Only external labels should be updated when data-label='false'
+    await u.isNull(`#slider-7-container .internal-label`)
+  })
+
+  it('can update external labels with slider-state tracking', async () => {
+    // Make sure external label is in place
+
+    await u.setValue('#slider-7 input', '4')
+    expect(await u.data(`#slider-7-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('increased')
+
+    await u.setValue('#slider-7 input', '2')
+    expect(await u.data(`#slider-7-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('decreased')
+
+    await u.setValue('#slider-7 input', '3')
+    expect(await u.data(`#slider-7-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('initial')
+
+  })
+
 })

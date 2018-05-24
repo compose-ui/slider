@@ -48,5 +48,9 @@ module.exports = u = {
 
   text: async (selector) => {
     return await page.$eval(selector, e => e.textContent);
+  },
+
+  isNull: async (selector) => {
+    return expect( await page.$(selector)).toBe(null)
   }
 }
