@@ -90,7 +90,7 @@ describe('Slider', () => {
 
   it('can disable the label', async () => {
     // data-label='false' should prevent the label from showing
-    await u.matchText('#slider-5', '')
+    await u.isNull(`#slider-5 .internal-label`)
   })
 
   it('adds line labels', async () => {
@@ -113,7 +113,7 @@ describe('Slider', () => {
     await u.matchText(`#slider-7-container [data-slider-label="disk"]`, '3GB')
     
     // Only external labels should be updated when data-label='false'
-    await u.isNull(`#slider-7-container .internal-label`)
+    await u.isNull(`#slider-7 .internal-label`)
   })
 
   it('updates external labels with slider-state tracking', async () => {
