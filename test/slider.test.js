@@ -103,30 +103,53 @@ describe('Slider', () => {
     await u.matchText(`#slider-6 .slider-segment:last-child .slider-line-label`, '30,000')
   })
 
+  it('adds line labels with defaulted indexes', async () => {
+    // There should only be three slider line labels
+    await u.countIs('#slider-7 .slider-line-label', 3)
+
+    // Line labels should occupy the right place in the DOM and have the right text
+    await u.matchText(`#slider-7 .slider-segment:first-child .slider-line-label`, '10,000')
+    await u.matchText(`#slider-7 .slider-segment:nth-child(2) .slider-line-label`, '20,000')
+    await u.matchText(`#slider-7 .slider-segment:nth-child(3) .slider-line-label`, '30,000')
+  })
+
   it('only updates external labels when data-label="false"', async () => {
     // Make sure external label is in place
-    await u.setValue('#slider-7-container #slider-7 input', '1')
-    await u.matchText(`#slider-7-container [data-slider-label="disk"]`, '2GB')
+    await u.setValue('#slider-8-container #slider-8 input', '1')
+    await u.matchText(`#slider-8-container [data-slider-label="disk"]`, '2GB')
 
     // Make sure external label is updated when changing slider value
-    await u.setValue('#slider-7-container #slider-7 input', '2')
-    await u.matchText(`#slider-7-container [data-slider-label="disk"]`, '3GB')
+    await u.setValue('#slider-8-container #slider-8 input', '2')
+    await u.matchText(`#slider-8-container [data-slider-label="disk"]`, '3GB')
     
     // Only external labels should be updated when data-label='false'
-    await u.isNull(`#slider-7 .internal-label`)
+    await u.isNull(`#slider-8 .internal-label`)
   })
 
   it('updates external labels with slider-state tracking', async () => {
-    // Make sure external label is in place
 
-    await u.setValue('#slider-7 input', '4')
-    expect(await u.data(`#slider-7-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('increased')
+    await u.setValue('#slider-8 input', '4')
+    expect(await u.data(`#slider-8-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('increased')
 
-    await u.setValue('#slider-7 input', '2')
-    expect(await u.data(`#slider-7-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('decreased')
+    await u.setValue('#slider-8 input', '2')
+    expect(await u.data(`#slider-8-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('decreased')
 
-    await u.setValue('#slider-7 input', '3')
-    expect(await u.data(`#slider-7-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('initial')
+    await u.setValue('#slider-8 input', '3')
+    expect(await u.data(`#slider-8-container [data-track-slider-state="#disk"]`, 'sliderState')).toBe('initial')
+
+  })
+
+  it('updates external labels with slider-state tracking', async () => {
+
+    // Make sure the default label is never displayed when multiple labels are present
+    await u.isNull(`#slider-9 .slider-label-default`)
+
+    await u.matchText('#slider-9 .slider-label-a', 'a1a')
+    await u.matchText('#slider-9 .slider-label-b', 'b5b')
+
+    await u.setValue('#slider-9 input', '3')
+    await u.matchText('#slider-9 .slider-label-a', 'a4a')
+    await u.matchText('#slider-9 .slider-label-b', 'b8b')
 
   })
 
