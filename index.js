@@ -224,6 +224,10 @@ var Slider = {
     else
       classes.push("without-label")
 
+    if (data.max >= 30) {
+      slider.classList.add('hidden-segments') 
+    }
+
     containerHTML = '<div class="'+classes.join(' ')+'" id="slider'+data.id+'">'
       + containerHTML
       +'</div>'
