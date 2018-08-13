@@ -153,4 +153,10 @@ describe('Slider', () => {
 
   })
 
+  it('adds and removes class for hidden segments', async () => {
+    await u.findElement('#slider-10 .hidden-segments')
+    await u.findElement('#slider-11 .hidden-segments')
+    await u.isNull('#slider-12 .hidden-segments')
+  })
+
 })
