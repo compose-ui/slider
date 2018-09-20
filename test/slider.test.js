@@ -153,4 +153,11 @@ describe('Slider', () => {
 
   })
 
+  it('adds disabled class to the container when slider is disabled', async () => {
+    // when the slider input contains the disabled attribute, 
+    // the container should have the 'slider-disabled' class
+    await u.findElement('#slider-10 [disabled="disabled"]')
+    await u.findElement(`.slider-container.slider-disabled`)
+  })
+
 })
