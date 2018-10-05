@@ -99,3 +99,27 @@ This will:
 - Create a hidden input with `name='scale'` and set its value to `1`.
 - Find elements matching `data-slider-label='price'` and set its contents to: `$10/month`.
 
+
+#### Track slider state changes
+
+If a slider increases, decreases, or returns to its original value, it can update an element contents and `data-` attribute to describe the change.
+
+```html
+<span data-track-slider-state='#id-of-slider'></span>
+```
+
+If a slider is updated this element will be udpated as follows.
+
+```html
+<span data-slider-state='initial' data-track-slider-state='#id-of-slider'></span>
+<span data-slider-state='increased' data-track-slider-state='#id-of-slider'></span>
+<span data-slider-state='decreased' data-track-slider-state='#id-of-slider'></span>
+```
+
+This is useful to change colors or hide and show content based on slider changes. For example.
+
+```css
+[data-slider-state=increased] { color: green; }
+[data-slider-state=decreased] { color: red; }
+```
+
