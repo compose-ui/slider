@@ -223,6 +223,9 @@ var Slider = {
       classes.push("with-label")
     else
       classes.push("without-label")
+    
+    if(slider.hasAttribute('disabled'))
+      classes.push('slider-disabled')
 
     containerHTML = '<div class="'+classes.join(' ')+'" id="slider'+data.id+'">'
       + containerHTML
